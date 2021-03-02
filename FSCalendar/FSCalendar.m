@@ -50,7 +50,6 @@ typedef NS_ENUM(NSUInteger, FSCalendarOrientation) {
 
 @property (strong, nonatomic) NSCalendar *gregorian;
 @property (strong, nonatomic) NSDateFormatter *formatter;
-@property (strong, nonatomic) NSTimeZone *timeZone;
 
 @property (weak  , nonatomic) UIView                     *contentView;
 @property (weak  , nonatomic) UIView                     *daysContainer;
@@ -157,9 +156,7 @@ typedef NS_ENUM(NSUInteger, FSCalendarOrientation) {
     _firstWeekday = 1;
     [self invalidateDateTools];
     
-    _today = [self.gregorian startOfDayForDate:[NSDate date]];
-    _currentPage = [self.gregorian fs_firstDayOfMonth:_today];
-    
+    [self updateToday];
     
     _minimumDate = [self.formatter dateFromString:@"1970-01-01"];
     _maximumDate = [self.formatter dateFromString:@"2099-12-31"];
@@ -257,6 +254,26 @@ typedef NS_ENUM(NSUInteger, FSCalendarOrientation) {
     if (!CGRectIsEmpty(frame) && self.transitionCoordinator.state == FSCalendarTransitionStateIdle) {
         [self invalidateViewFrames];
     }
+}
+
+- (void)setTimeZone:(NSTimeZone *)tz
+{
+    _timeZone = tz;
+    [self invalidateDateTools];
+    [self updateToday];
+    [self reloadData];
+}
+
+- (void)updateToday
+{
+    NSDateComponents *dateComponents = [self.gregorian components:(NSCalendarUnitYear|NSCalendarUnitMonth|NSCalendarUnitDay) fromDate:[NSDate date]];
+    dateComponents.hour = 0;
+    dateComponents.minute = 0;
+    dateComponents.second = 0;
+    dateComponents.timeZone = self.timeZone;
+
+    _today = [self.gregorian dateFromComponents:dateComponents];
+    _currentPage = [self.gregorian fs_firstDayOfMonth:_today];
 }
 
 - (void)setValue:(id)value forUndefinedKey:(NSString *)key

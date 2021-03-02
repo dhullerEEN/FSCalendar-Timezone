@@ -403,6 +403,11 @@ IB_DESIGNABLE
 @property (readonly, nonatomic) NSArray<NSDate *> *selectedDates;
 
 /**
+The timezone of the calendar. `defaultTimeZone` by default.
+ */
+@property (strong, nonatomic) NSTimeZone *timeZone;
+
+/**
  Reload the dates and appearance of the calendar.
  */
 - (void)reloadData;
